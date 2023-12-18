@@ -31,7 +31,7 @@ int main(int argc, char** argv)
 	// Sanity checks
 	if(argc != 2)
 	{
-		fprintf(stderr, "USAGE: %s <message to send>\n");
+		// fprintf(stderr, "USAGE: %s <message to send>\n");
 		exit(-1);
 	}
 		
@@ -53,9 +53,9 @@ int main(int argc, char** argv)
     }
 
 	// Read file 
-	while (!feof(fileToSend)) {
+	while (!feof(fileSend)) {
         // Read at most MAX_READ_SIZE bytes from the file
-        size_t bytesRead = fread(messageBuff, 1, MAX_READ_SIZE, fileToSend);
+        size_t bytesRead = fread(messageBuff, 1, MAX_READ_SIZE, fileSend);
 
         // Send the bytes read through the message queue
         retVal = mq_send(myQueue, messageBuff, bytesRead, 1);
@@ -78,7 +78,7 @@ int main(int argc, char** argv)
 	}
 
 	// Close file and the message queue
-	fclose(fileToSend);
+	fclose(fileSend);
 	mq_close(myQueue);
 		
 	return 0;
