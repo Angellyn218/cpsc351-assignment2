@@ -38,18 +38,21 @@ int main(int argc, char** argv) {
     }
 
     // Read file
+    size_t totalBytesWritten = 0;
     while (!feof(fileSend)) {
         size_t bytesRead = fread(messageBuff, 1, MAX_READ_SIZE, fileSend);
 
-        retVal = mq_send(myQueue, messageBuff, bytesRead, 1);
-		fprintf(stdout, "Wrote %zd bytes to message queue.\n", retVal); // Print bytes written
+        if (bytesRead > 0) {
+            retVal = mq_send(myQueue, messageBuff, bytesRead, 1);
 
-        if (retVal == -1) {
-            perror("mq_send");
-            return -1; // Return -1 on error
+            if (retVal == -1) {
+                perror("mq_send");
+                return -1; // Return -1 on error
+            }
+
+            totalBytesWritten += bytesRead;
+            fprintf(stdout, "Wrote %zu bytes to message queue.\n", bytesRead); // Print bytes written to stdout
         }
-
-		
     }
 
     // Send an empty message to indicate end of file
@@ -59,6 +62,8 @@ int main(int argc, char** argv) {
         perror("mq_send");
         return -1; // Return -1 on error
     }
+
+    fprintf(stdout, "Total bytes written to message queue: %zu\n", totalBytesWritten); // Print total bytes written
 
     // Close file and the message queue
     fclose(fileSend);
