@@ -62,7 +62,7 @@ int main()
 
 			// Write the message content to the file
 			fwrite(messageBuff, 1, retVal, fileRecv);
-			fprintf(stderr, "%s\n", messageBuff);
+			// (stderr, "%s\n", messageBuff);
 
 			// Close the file
 			fclose(fileRecv);
