@@ -59,16 +59,18 @@ int main(int argc, char** argv)
 
         // Send the bytes read through the message queue
         retVal = mq_send(myQueue, messageBuff, bytesRead, 1);
+
+		// Send file sanity check
         if (retVal == -1) {
             perror("mq_send");
             exit(-1);
         }
     }
 
-	// Empty message for end of file indication
+	// Empty message for indication of end of file 
 	retVal = mq_send(myQueue, "", 0, 2);
 	
-	// Send sanity checks
+	// Send file sanity checks
 	if(retVal == -1)
 	{
 		perror("mq_send");

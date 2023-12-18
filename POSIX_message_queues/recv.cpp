@@ -37,11 +37,12 @@ int main()
 		perror("mq_open");
 		exit(-1);
 	}
+
 	while (1) {
 		// NOTE: the MQ_MSGSIZE must be greater than
 		// the mq_msgsize field of the attribute struct
 		// used to create the queue	
-		retVal = mq_receive(myQueue, messageBuff,MQ_MSGSIZE, NULL);
+		retVal = mq_receive(myQueue, messageBuff, MQ_MSGSIZE, NULL);
 		
 		// Sanity checks
 		if(retVal == -1)
@@ -53,7 +54,8 @@ int main()
 		// fprintf(stderr, "%s\n", messageBuff);
 
 		if (retVal > 0) {
-			FILE *fileRecv = fopen("filerecv", "a");
+			// open file
+			FILE *fileRecv = fopen("file_recv", "a");
 
 			if (fileRecv == NULL) {
 				perror("fopen");
@@ -65,6 +67,7 @@ int main()
 
 			// Close the file
 			fclose(fileRecv);
+			
 		} else {
 			// Close the queue
 			mq_close(myQueue);
