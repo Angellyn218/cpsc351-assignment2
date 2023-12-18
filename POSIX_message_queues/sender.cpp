@@ -10,61 +10,51 @@
 #define MQ_NAME "/cpsc351queue"
 
 int main(int argc, char** argv) {
-    mqd_t myQueue, retVal;
-    FILE *fileSend;
+    mqd_t myQueue;
+    ssize_t retVal;
     char messageBuff[MAX_READ_SIZE];
+    FILE *fileSend;
 
-    // The message queue attributes
-    struct mq_attr attr;
+    // Open the message queue
+    myQueue = mq_open(MQ_NAME, O_WRONLY);
 
-    // Initialize the attributes
-    attr.mq_flags = 0;
-    attr.mq_maxmsg = 10;
-    attr.mq_msgsize = 4096;
-    attr.mq_curmsgs = 0;
-
-    // Sanity checks for command-line arguments
-    if (argc != 2) {
-        fprintf(stderr, "USAGE: %s <file name>\n", argv[0]);
-        exit(-1);
-    }
-
-    // Let's create the queue
-    myQueue = mq_open(MQ_NAME, O_CREAT | O_RDWR, 0744, &attr);
-    if (myQueue < 0) {
+    if (myQueue == (mqd_t)-1) {
         perror("mq_open");
-        exit(-1);
+        exit(EXIT_FAILURE);
     }
 
-	// Open the file for reading
+    // Open the file for sending
     fileSend = fopen(argv[1], "rb");
-	if (fileSend == NULL) {
-		perror("fopen");
-		exit(-1);
-	}
 
-	printf("File opened successfully.\n");
+    if (fileSend == NULL) {
+        perror("fopen");
+        exit(EXIT_FAILURE);
+    }
 
-	// Read file and send content through the message queue
-	size_t bytesRead;
-	while ((bytesRead = fread(messageBuff, 1, MAX_READ_SIZE, fileSend)) > 0) {
-		printf("Read %zu bytes from the file.\n", bytesRead);
+    // Read file
+    while (!feof(fileSend)) {
+        size_t bytesRead = fread(messageBuff, 1, MAX_READ_SIZE, fileSend);
 
-		// Send the bytes read through the message queue
-		retVal = mq_send(myQueue, messageBuff, bytesRead, 1);
+        retVal = mq_send(myQueue, messageBuff, bytesRead, 1);
 
-		// Send file sanity check
-		if (retVal == -1) {
-			perror("mq_send");
-			exit(-1);
-		}
+        if (retVal == -1) {
+            perror("mq_send");
+            exit(EXIT_FAILURE);
+        }
+    }
 
-		printf("Sent %zu bytes through the message queue.\n", bytesRead);
-	}
+    // Send an empty message to indicate end of file
+    retVal = mq_send(myQueue, "", 0, 1);
 
-    // Close the file and message queue after sending data
+    if (retVal == -1) {
+        perror("mq_send");
+        exit(EXIT_FAILURE);
+    }
+
+    // Close file and the message queue
     fclose(fileSend);
     mq_close(myQueue);
 
     return 0;
 }
+
