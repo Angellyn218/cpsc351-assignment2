@@ -51,8 +51,6 @@ int main()
 			exit(-1);
 		}
 
-		// fprintf(stderr, "%s\n", messageBuff);
-
 		if (retVal > 0) {
 			// open file
 			FILE *fileRecv = fopen("file__recv", "a");
@@ -64,6 +62,7 @@ int main()
 
 			// Write the message content to the file
 			fwrite(messageBuff, 1, retVal, fileRecv);
+			fprintf(stderr, "%s\n", messageBuff);
 
 			// Close the file
 			fclose(fileRecv);

@@ -31,7 +31,7 @@ int main(int argc, char** argv)
 	// Sanity checks
 	if(argc != 2)
 	{
-		// fprintf(stderr, "USAGE: %s <message to send>\n");
+		fprintf(stderr, "USAGE: %s <message to send>\n");
 		exit(-1);
 	}
 		
