@@ -11,25 +11,31 @@
 #define FILENAME "file__recv"
 
 int main() {
+	// creates necessary variables
     mqd_t myQueue;
+	ssize_t retVal;
     char messageBuff[MQ_MSGSIZE];
+	FILE *fileRecv;
 
     // Create or open the queue
     myQueue = mq_open(MQ_NAME, O_RDWR | O_CREAT, 0744, NULL);
 
+	// checks if there is an error opening queue
     if (myQueue == (mqd_t)-1) {
         perror("mq_open");
         exit(EXIT_FAILURE);
     }
 
-    FILE *fileRecv = fopen(FILENAME, "a");
+	// create file
+    fileRecv = fopen(FILENAME, "a");
+
+	// checks for errors in opening file
     if (fileRecv == NULL) {
         perror("fopen");
         exit(EXIT_FAILURE);
     }
 
-    ssize_t retVal;
-
+	// loop through  message queue
     do {
         retVal = mq_receive(myQueue, messageBuff, MQ_MSGSIZE, NULL);
 

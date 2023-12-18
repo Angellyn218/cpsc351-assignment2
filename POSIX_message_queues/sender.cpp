@@ -10,6 +10,7 @@
 #define MQ_NAME "/cpsc351queue"
 
 int main(int argc, char** argv) {
+	// defines necessary variables
     mqd_t myQueue;
     ssize_t retVal;
     char messageBuff[MAX_READ_SIZE];
@@ -63,6 +64,7 @@ int main(int argc, char** argv) {
         return -1; // Return -1 on error
     }
 
+	// Prints total bytes written
     fprintf(stdout, "Total bytes written to message queue: %zu\n", totalBytesWritten); // Print total bytes written
 
     // Close file and the message queue
