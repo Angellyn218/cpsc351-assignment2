@@ -55,7 +55,7 @@ int main()
 
 		if (retVal > 0) {
 			// open file
-			FILE *fileRecv = fopen("file_recv", "a");
+			FILE *fileRecv = fopen("file__recv", "a");
 
 			if (fileRecv == NULL) {
 				perror("fopen");
@@ -67,7 +67,7 @@ int main()
 
 			// Close the file
 			fclose(fileRecv);
-			
+
 		} else {
 			// Close the queue
 			mq_close(myQueue);
