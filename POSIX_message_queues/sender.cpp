@@ -23,29 +23,23 @@ int main(int argc, char** argv) {
     attr.mq_msgsize = 4096;
     attr.mq_curmsgs = 0;
 
-    // Sanity checks
+    // Sanity checks for command-line arguments
     if (argc != 2) {
         fprintf(stderr, "USAGE: %s <file name>\n", argv[0]);
         exit(-1);
     }
 
-	fprintf(stderr, "Error message\n");
-	fflush(stderr);
-
-
-    // Let's create the queue
-    myQueue = mq_open(MQ_NAME, O_CREAT | O_RDWR, 0744, &attr);
-
-    // Sanity checks
-    if (myQueue < 0) {
-        perror("mq_open");
-        exit(-1);
-    }
-
-    // Open the send file
+    // Open the file for reading
     fileSend = fopen(argv[1], "rb");
     if (fileSend == NULL) {
         perror("fopen");
+        exit(-1);
+    }
+
+    // Let's create the queue
+    myQueue = mq_open(MQ_NAME, O_CREAT | O_RDWR, 0744, &attr);
+    if (myQueue < 0) {
+        perror("mq_open");
         exit(-1);
     }
 
@@ -62,19 +56,8 @@ int main(int argc, char** argv) {
         }
     }
 
-    // Close file
+    // Close the file and message queue after sending data
     fclose(fileSend);
-
-    // Empty message for indication of end of file
-    retVal = mq_send(myQueue, "", 0, 2);
-
-    // Send file sanity checks
-    if (retVal == -1) {
-        perror("mq_send");
-        exit(-1);
-    }
-
-    // Close the message queue after sending the end-of-file indicator
     mq_close(myQueue);
 
     return 0;
