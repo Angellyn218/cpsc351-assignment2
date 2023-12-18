@@ -49,13 +49,16 @@ int main() {
 			printf("Received and wrote %d bytes to file.\n", retVal);
 		} else {
 			printf("Received empty message or error.\n");
-			// Close the file and queue before exiting
-			fclose(fileRecv);
-			mq_close(myQueue);
-			mq_unlink(MQ_NAME);
-			exit(0);
+			break;
+			
 		}
 	}
+	// Close the file and queue before exiting
+	fclose(fileRecv);
+	mq_close(myQueue);
+	mq_unlink(MQ_NAME);
+	exit(0);
+
     // This part of the code is unreachable
     return 0;
 }
