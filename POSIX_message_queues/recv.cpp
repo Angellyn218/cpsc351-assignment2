@@ -12,27 +12,20 @@
 
 int main() {
     mqd_t myQueue, retVal;
-    mq_attr attr;
     char messageBuff[MQ_MSGSIZE];
 
-    // Initialize message queue attributes
-    attr.mq_flags = 0;
-    attr.mq_maxmsg = 10;
-    attr.mq_msgsize = 4096;
-    attr.mq_curmsgs = 0;
-
     // Create or open the queue
-    myQueue = mq_open(MQ_NAME, O_RDWR, 0744, &attr);
+    myQueue = mq_open(MQ_NAME, O_RDWR | O_CREAT, 0744, NULL);
 
     if (myQueue < 0) {
         perror("mq_open");
-        exit(-1);
+        exit(EXIT_FAILURE);
     }
 
     FILE *fileRecv = fopen(FILENAME, "a");
     if (fileRecv == NULL) {
         perror("fopen");
-        exit(-1);
+        exit(EXIT_FAILURE);
     }
 
     while (1) {
@@ -48,12 +41,8 @@ int main() {
             fwrite(messageBuff, 1, retVal, fileRecv);
             printf("Received and wrote %d bytes to file.\n", retVal);
         } else {
-            /// Check for an empty message or additional check for termination
-            retVal = mq_receive(myQueue, messageBuff, MQ_MSGSIZE, NULL);
-            if (retVal <= 0) {
-                printf("Received empty message or error.\n");
-                break; // Exit loop on empty message or error
-            }
+            printf("Received empty message or error.\n");
+            break; // Exit loop on empty message or error
         }
     }
 
@@ -64,4 +53,5 @@ int main() {
 
     return 0;
 }
+
 
