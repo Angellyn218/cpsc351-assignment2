@@ -15,12 +15,18 @@ int main(int argc, char** argv) {
     char messageBuff[MAX_READ_SIZE];
     FILE *fileSend;
 
-    // Open the message queue
-    myQueue = mq_open(MQ_NAME, O_WRONLY);
+    struct mq_attr attr;
+    attr.mq_flags = 0;
+    attr.mq_maxmsg = 10;
+    attr.mq_msgsize = MAX_READ_SIZE;
+    attr.mq_curmsgs = 0;
+
+    // Create the message queue (if it doesn't exist)
+    myQueue = mq_open(MQ_NAME, O_CREAT | O_WRONLY, 0744, &attr);
 
     if (myQueue == (mqd_t)-1) {
         perror("mq_open");
-        exit(EXIT_FAILURE);
+        return -1; // Return -1 on error
     }
 
     // Open the file for sending
@@ -28,7 +34,7 @@ int main(int argc, char** argv) {
 
     if (fileSend == NULL) {
         perror("fopen");
-        exit(EXIT_FAILURE);
+        return -1; // Return -1 on error
     }
 
     // Read file
@@ -39,7 +45,7 @@ int main(int argc, char** argv) {
 
         if (retVal == -1) {
             perror("mq_send");
-            exit(EXIT_FAILURE);
+            return -1; // Return -1 on error
         }
     }
 
@@ -48,7 +54,7 @@ int main(int argc, char** argv) {
 
     if (retVal == -1) {
         perror("mq_send");
-        exit(EXIT_FAILURE);
+        return -1; // Return -1 on error
     }
 
     // Close file and the message queue
@@ -57,4 +63,3 @@ int main(int argc, char** argv) {
 
     return 0;
 }
-
