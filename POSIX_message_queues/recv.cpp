@@ -36,29 +36,31 @@ int main() {
     }
 
     while (1) {
-		retVal = mq_receive(myQueue, messageBuff, MQ_MSGSIZE, NULL);
+        retVal = mq_receive(myQueue, messageBuff, MQ_MSGSIZE, NULL);
 
-		if (retVal == -1) {
-			perror("mq_receive");
-			exit(-1);
-		}
+        if (retVal == -1) {
+            perror("mq_receive");
+            break; // Exit loop on receive error
+        }
 
-		if (retVal > 0) {
-			// Write the message content to the file
-			fwrite(messageBuff, 1, retVal, fileRecv);
-			printf("Received and wrote %d bytes to file.\n", retVal);
-		} else {
-			printf("Received empty message or error.\n");
-			break;
-			
-		}
-	}
-	// Close the file and queue before exiting
-	fclose(fileRecv);
-	mq_close(myQueue);
-	mq_unlink(MQ_NAME);
-	exit(0);
+        if (retVal > 0) {
+            // Write the message content to the file
+            fwrite(messageBuff, 1, retVal, fileRecv);
+            printf("Received and wrote %d bytes to file.\n", retVal);
+        } else {
+            // Check for an empty message
+            if (mq_receive(myQueue, messageBuff, MQ_MSGSIZE, NULL) <= 0) {
+                printf("Received empty message or error.\n");
+                break; // Exit loop on empty message or error
+            }
+        }
+    }
 
-    // This part of the code is unreachable
+    // Close the file and queue before exiting
+    fclose(fileRecv);
+    mq_close(myQueue);
+    mq_unlink(MQ_NAME);
+
     return 0;
 }
+
