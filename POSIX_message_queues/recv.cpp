@@ -48,8 +48,9 @@ int main() {
             fwrite(messageBuff, 1, retVal, fileRecv);
             printf("Received and wrote %d bytes to file.\n", retVal);
         } else {
-            // Check for an empty message
-            if (mq_receive(myQueue, messageBuff, MQ_MSGSIZE, NULL) <= 0) {
+            /// Check for an empty message or additional check for termination
+            retVal = mq_receive(myQueue, messageBuff, MQ_MSGSIZE, NULL);
+            if (retVal <= 0) {
                 printf("Received empty message or error.\n");
                 break; // Exit loop on empty message or error
             }
