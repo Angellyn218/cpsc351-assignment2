@@ -11,13 +11,13 @@
 #define FILENAME "file__recv"
 
 int main() {
-    mqd_t myQueue, retVal;
+    mqd_t myQueue;
     char messageBuff[MQ_MSGSIZE];
 
     // Create or open the queue
     myQueue = mq_open(MQ_NAME, O_RDWR | O_CREAT, 0744, NULL);
 
-    if (myQueue < 0) {
+    if (myQueue == (mqd_t)-1) {
         perror("mq_open");
         exit(EXIT_FAILURE);
     }
@@ -28,7 +28,9 @@ int main() {
         exit(EXIT_FAILURE);
     }
 
-    while (1) {
+    ssize_t retVal;
+
+    do {
         retVal = mq_receive(myQueue, messageBuff, MQ_MSGSIZE, NULL);
 
         if (retVal == -1) {
@@ -39,12 +41,10 @@ int main() {
         if (retVal > 0) {
             // Write the message content to the file
             fwrite(messageBuff, 1, retVal, fileRecv);
-            printf("Received and wrote %d bytes to file.\n", retVal);
-        } else {
-            printf("Received empty message or error.\n");
-            break; // Exit loop on empty message or error
+            printf("Received and wrote %zd bytes to file.\n", retVal);
         }
-    }
+
+    } while (retVal > 0); // Continue until an empty message or error is received
 
     // Close the file and queue before exiting
     fclose(fileRecv);
