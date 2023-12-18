@@ -42,13 +42,14 @@ int main(int argc, char** argv) {
         size_t bytesRead = fread(messageBuff, 1, MAX_READ_SIZE, fileSend);
 
         retVal = mq_send(myQueue, messageBuff, bytesRead, 1);
+		fprintf(stdout, "Wrote %zd bytes to message queue.\n", retVal); // Print bytes written
 
         if (retVal == -1) {
             perror("mq_send");
             return -1; // Return -1 on error
         }
 
-		fprintf(stdout, "Wrote %zd bytes to message queue.\n", retVal); // Print bytes written
+		
     }
 
     // Send an empty message to indicate end of file
