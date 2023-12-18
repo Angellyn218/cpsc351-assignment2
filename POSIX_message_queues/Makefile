@@ -1,3 +1,5 @@
+.PHONY: all clean
+
 all:	recv sender
 
 sender:	sender.cpp
