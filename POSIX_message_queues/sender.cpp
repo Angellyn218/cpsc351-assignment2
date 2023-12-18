@@ -29,6 +29,10 @@ int main(int argc, char** argv) {
         exit(-1);
     }
 
+	fprintf(stderr, "Error message\n");
+	fflush(stderr);
+
+
     // Let's create the queue
     myQueue = mq_open(MQ_NAME, O_CREAT | O_RDWR, 0744, &attr);
 
